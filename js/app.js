@@ -30,6 +30,47 @@ function norm(s){
 const PHR=[], WRD={};
 for(const [c,list] of Object.entries(RAW)) list.split(',').forEach(t=>{const n=norm(t); if(!n)return; if(n.includes(' ')) PHR.push([n,c]); else if(!WRD[n]) WRD[n]=c;});
 PHR.sort((a,b)=>b[0].length-a[0].length);
+/* ================== Émojis ================== */
+const CAT_EMO={fruits:'🥬',boucherie:'🥩',cremerie:'🧀',epicerie:'🥫',surgeles:'🧊',boissons:'🥤',hygiene:'🧴',entretien:'🧽',autre:'🛒'};
+const EMO_RAW={
+ '🍎':'pomme','🍐':'poire','🍌':'banane','🍊':'orange,clémentine,mandarine,pamplemousse','🍋':'citron,citron vert','🥝':'kiwi',
+ '🍓':'fraise,framboise','🫐':'myrtille','🍇':'raisin','🍈':'melon','🍉':'pastèque','🍑':'pêche,nectarine,abricot','🍒':'cerise',
+ '🥭':'mangue','🍍':'ananas','🥥':'noix de coco','🥑':'avocat','🍅':'tomate,tomate cerise,sauce tomate,coulis de tomate,concentré de tomate',
+ '🍆':'aubergine','🥕':'carotte','🥔':'pomme de terre,patate,chips','🍠':'patate douce','🧅':'oignon,échalote','🧄':'ail',
+ '🥦':'brocoli,chou-fleur','🥬':'salade,laitue,mâche,roquette,chou,épinard,poireau,endive,céleri,fenouil','🥒':'concombre,courgette,cornichon',
+ '🫑':'poivron','🌶️':'piment','🌽':'maïs','🍄':'champignon','🫛':'haricot vert,petit pois,haricot','🫘':'lentille,pois chiche,haricot rouge',
+ '🫚':'gingembre','🌿':'persil,basilic,coriandre,menthe,ciboulette,herbe,thym','🎃':'potiron,courge,citrouille','🥜':'cacahuète','🌰':'noix,amande,noisette,châtaigne',
+ '🍖':'jambon,jambon cru,jambon blanc,jambon de paris,viande,rillette,pâté de campagne,rôti,agneau,porc,veau,saucisson,chorizo,salami',
+ '🥩':'steak,boeuf,bœuf,steak haché,viande hachée,escalope,côte,rosbif','🍗':'poulet,dinde,blanc de poulet,cordon bleu,nugget,canard',
+ '🥓':'bacon,lardon','🌭':'saucisse,knacki,merguez,chipolata','🐟':'poisson,saumon,cabillaud,thon,sardine,poisson pané','🦐':'crevette','🦪':'moule,huître',
+ '🥛':'lait,crème,crème fraîche,yaourt,yogourt,skyr,fromage blanc,petit suisse,dessert,crème dessert','🧈':'beurre,margarine',
+ '🧀':'fromage,emmental,gruyère,comté,camembert,mozzarella,parmesan,chèvre,feta,raclette,brie,roquefort,reblochon,fromage râpé,ricotta,mascarpone',
+ '🥚':'oeuf,œuf','🍮':'flan','🥧':'pâte feuilletée,pâte brisée,tarte','🍝':'pâte,pâtes,spaghetti,tagliatelle,coquillette,lasagne,raviolis',
+ '🍚':'riz,semoule,quinoa','🍞':'pain de mie,biscotte','🥖':'pain,baguette','🥐':'croissant,brioche,viennoiserie,pain au chocolat',
+ '🧂':'sel,poivre,épice','🫒':'huile,olive,huile d\'olive','🍯':'miel,confiture','🥣':'céréale,muesli','🍫':'chocolat,nutella',
+ '🍪':'biscuit','🍰':'gâteau','🍬':'bonbon','🥫':'conserve,soupe,sauce,ketchup,mayonnaise,moutarde,vinaigre,bouillon,purée,compote',
+ '☕':'café','🍵':'thé,tisane','🌮':'tortilla','🍕':'pizza','🍟':'frite','🍦':'glace,esquimau','🍨':'sorbet','🧊':'glaçon,surgelé',
+ '💧':'eau,eau gazeuse,perrier,badoit','🧃':'jus','🥤':'soda,coca,limonade,orangina,ice tea,boisson','🍺':'bière,cidre','🍷':'vin',
+ '🍾':'champagne','🥃':'whisky,rhum,vodka,pastis','🍹':'sirop',
+ '🧴':'shampoing,shampooing,après-shampoing,gel douche,crème solaire,crème hydratante,déodorant,deodorant,démaquillant,lotion',
+ '🧼':'savon','🪥':'brosse à dent,dentifrice,bain de bouche','🧻':'papier toilette,essuie-tout,sopalin,mouchoir,lingette',
+ '🪒':'rasoir,mousse à raser','🍼':'couche,lait bébé','💄':'maquillage','🩹':'pansement','💊':'médicament,doliprane',
+ '🧺':'lessive,adoucissant','🧽':'éponge,liquide vaisselle,produit vaisselle,pastille lave-vaisselle,nettoyant,détergent,serpillière,gant de ménage',
+ '🗑️':'sac poubelle','🧪':'javel,eau de javel,vinaigre blanc','💡':'ampoule','🔋':'pile','🔥':'allume-feu','🌸':'désodorisant','🐱':'croquette,litière','🍽️':'film alimentaire,papier alu,papier aluminium,sac congélation'
+};
+const EPHR=[], EWRD={};
+for(const [e,list] of Object.entries(EMO_RAW)) list.split(',').forEach(t=>{const n=norm(t); if(!n) return; if(n.includes(' ')) EPHR.push([n,e]); else if(!EWRD[n]) EWRD[n]=e;});
+EPHR.sort((a,b)=>b[0].length-a[0].length);
+const EMO_PICK=[...new Set([...Object.keys(EMO_RAW),...Object.values(CAT_EMO),'🛍️','🎁','🌱','🧁','🥗','🍜','🥟','🧇','🥞','🥨','🥯','🍔','🌯','🥙','🍲','🫕','🍏','🍋‍🟩','🍷','🧉','🫗','🐶','🪴','🕯️','🧹','🪣','🧷','✂️','📦','📝'])];
+function emoFor(name,cat){
+  const n=norm(name);
+  if(learnedE[n]) return learnedE[n];
+  const pad=' '+n+' ';
+  for(const [p,e] of EPHR) if(pad.includes(' '+p+' ')) return e;
+  for(const w of n.split(' ')) if(EWRD[w]) return EWRD[w];
+  return CAT_EMO[cat]||'🛒';
+}
+
 function guessCat(name){
   const n=norm(name);
   if(learned[n]) return learned[n];
@@ -43,10 +84,10 @@ function guessCat(name){
 const ENV=window.CABAS_ENV||'local';
 const VERSION=self.CABAS_VERSION||'?';
 const KEY='cabas:'+ENV;
-let items=[], hist={}, learned={}, S={sort:'alpha', fs:2};
+let items=[], hist={}, learned={}, learnedE={}, S={sort:'alpha', fs:2};
 const uid=()=>Math.random().toString(36).slice(2,9);
 function seed(){
-  learned={}; hist={}; items=[];
+  learned={}; learnedE={}; hist={}; items=[];
   const now=Date.now();
   ['Œufs','Pâtes','Jambon','Lait','Tomates','Pommes','Pain','Café','Lessive','Shampoing','Eau gazeuse','Beurre','Yaourts','Papier toilette','Glace vanille','Riz','Poulet','Salade','Liquide vaisselle']
     .forEach((n,i)=>items.push({id:uid(),name:n,cat:guessCat(n),taken:false,t:now+i}));
@@ -55,10 +96,10 @@ function seed(){
     .forEach((n,i)=>{hist[norm(n)]={name:n,cat:guessCat(n),c:1+((i*7)%5)}});
 }
 function load(){
-  try{const d=JSON.parse(localStorage.getItem(KEY)); if(d&&Array.isArray(d.items)){items=d.items; hist=d.hist||{}; learned=d.learned||{}; S={...S,...(d.S||{})}; return;}}catch(e){}
+  try{const d=JSON.parse(localStorage.getItem(KEY)); if(d&&Array.isArray(d.items)){items=d.items; hist=d.hist||{}; learned=d.learned||{}; learnedE=d.learnedE||{}; S={...S,...(d.S||{})}; return;}}catch(e){}
   if(ENV!=='prod') seed();
 }
-function save(){try{localStorage.setItem(KEY,JSON.stringify({items,hist,learned,S}))}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({items,hist,learned,learnedE,S}))}catch(e){}}
 const vib=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const cmp=(a,b)=>a.name.localeCompare(b.name,'fr',{sensitivity:'base'});
@@ -132,7 +173,7 @@ function resultText(r){
 
 /* ================== Rendu ================== */
 const grid=document.getElementById('grid');
-function btn(i){return `<button class="item cat-${i.cat}${i.taken?' taken':''}" data-id="${i.id}" style="--h:${CAT[i.cat].h}"><span class="label">${esc(i.name)}</span></button>`}
+function btn(i){return `<button class="item cat-${i.cat}${i.taken?' taken':''}" data-id="${i.id}" style="--h:${CAT[i.cat].h}"><span class="emo" aria-hidden="true">${emoFor(i.name,i.cat)}</span><span class="label">${esc(i.name)}</span></button>`}
 function render(flashIds){
   const first=new Map();
   grid.querySelectorAll('[data-id]').forEach(el=>first.set(el.dataset.id,el.getBoundingClientRect()));
@@ -207,7 +248,7 @@ function textSheet(){
       let c=Object.entries(hist).filter(([k])=>!inList.has(k));
       if(q) c=c.filter(([k])=>k.startsWith(q)||k.split(' ').some(w=>w.startsWith(q)));
       c=c.sort((a,b)=>(b[1].c-a[1].c)||((b[1].l||0)-(a[1].l||0))).slice(0,q?6:8);
-      sugg.innerHTML=c.map(([k,v])=>`<button type="button" class="chip cat-${v.cat}" style="--h:${CAT[v.cat].h}" data-n="${esc(v.name)}">${esc(v.name)}</button>`).join('');
+      sugg.innerHTML=c.map(([k,v])=>`<button type="button" class="chip emo-chip" data-n="${esc(v.name)}"><span aria-hidden="true">${emoFor(v.name,v.cat)}</span>${esc(v.name)}</button>`).join('');
     };
     sheet.querySelector('#f').addEventListener('submit',e=>{e.preventDefault(); const names=splitInput(inp.value); if(!names.length) return; show(addNames(names)); inp.value=''; suggest(); inp.focus();});
     inp.addEventListener('input',suggest);
@@ -270,6 +311,7 @@ function itemMenu(id){
   const main=()=>{
     sheet.innerHTML=`<div class="grab"></div><h3>${esc(i.name)} ${X}</h3>
       <button class="sbtn" data-a="edit"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>Modifier le nom</button>
+      <button class="sbtn" data-a="emo"><span style="font-size:20px; width:18px; text-align:center">${emoFor(i.name,i.cat)}</span>Changer le dessin</button>
       <button class="sbtn" data-a="cat"><span class="chip cat-${i.cat}" style="--h:${CAT[i.cat].h}; height:auto; border:0; padding:0; background:none"></span>Catégorie : ${CAT[i.cat].n}</button>
       <button class="sbtn danger" data-a="del"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>Supprimer</button>`;
   };
@@ -277,7 +319,17 @@ function itemMenu(id){
   sheet.onclick=e=>{
     const c=e.target.closest('[data-c]');
     if(c){i.cat=c.dataset.c; const n=norm(i.name); learned[n]=i.cat; if(hist[n]) hist[n].cat=i.cat; save(); closeSheet(); render([id]); return;}
+    const em=e.target.closest('[data-e]');
+    if(em){const n=norm(i.name); if(em.dataset.e) learnedE[n]=em.dataset.e; else delete learnedE[n]; save(); closeSheet(); render([id]); return;}
     const a=e.target.closest('[data-a]'); if(!a) return;
+    if(a.dataset.a==='emo'){
+      const n=norm(i.name), cur=emoFor(i.name,i.cat);
+      sheet.innerHTML=`<div class="grab"></div><h3>Dessin de « ${esc(i.name)} » ${X}</h3>
+        <div class="emogrid">${EMO_PICK.map(x=>`<button data-e="${x}" class="${x===cur?'sel':''}">${x}</button>`).join('')}</div>
+        ${learnedE[n]?`<button class="sbtn" data-e="" style="margin-top:12px; justify-content:center">Revenir au dessin automatique</button>`:''}
+        <div class="hint">Cabas retiendra ce choix pour les prochaines fois.</div>`;
+      return;
+    }
     if(a.dataset.a==='del'){const snap=JSON.stringify(items); items=items.filter(x=>x.id!==id); save(); render(); closeSheet(); toast(`« ${i.name} » supprimé`,()=>{items=JSON.parse(snap); save(); render([id]);});}
     if(a.dataset.a==='edit'){
       sheet.innerHTML=`<div class="grab"></div><h3>Modifier ${X}</h3><form class="field" id="ef"><input id="ei" value="${esc(i.name)}" autocomplete="off"><button class="pbtn">OK</button></form><div class="hint" id="eh"></div>`;
