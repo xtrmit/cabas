@@ -12,10 +12,10 @@ const CATS=[
 ];
 const CAT=Object.fromEntries(CATS.map(c=>[c.k,c]));
 const RAW={
- fruits:'pomme,poire,banane,orange,citron,citron vert,clémentine,mandarine,kiwi,fraise,framboise,myrtille,raisin,melon,pastèque,pêche,nectarine,abricot,cerise,prune,ananas,mangue,avocat,tomate,salade,laitue,mâche,roquette,carotte,courgette,aubergine,poivron,concombre,oignon,ail,échalote,poireau,chou,chou-fleur,brocoli,épinard,haricot,champignon,patate,pomme de terre,radis,céleri,persil,basilic,coriandre,menthe,ciboulette,fenouil,betterave,navet,potiron,courge,légume,fruit,endive,artichaut,asperge,gingembre,figue,grenade,pamplemousse,citrouille',
- boucherie:'jambon,poulet,boeuf,bœuf,steak,viande,porc,veau,agneau,saucisse,saucisson,lardon,bacon,dinde,canard,merguez,chipolata,rosbif,escalope,côte,rôti,haché,pâté de campagne,rillette,chorizo,salami,poisson,saumon,cabillaud,crevette,moule,cordon bleu,blanc de poulet,knacki,jambon cru',
+ fruits:'pomme,poire,banane,orange,citron,citron vert,clémentine,mandarine,kiwi,fraise,framboise,myrtille,raisin,melon,pastèque,pêche,nectarine,tomate cerise,pomme de terre,abricot,cerise,prune,ananas,mangue,avocat,tomate,salade,laitue,mâche,roquette,carotte,courgette,aubergine,poivron,concombre,oignon,ail,échalote,poireau,chou,chou-fleur,brocoli,épinard,haricot,champignon,patate,pomme de terre,radis,céleri,persil,basilic,coriandre,menthe,ciboulette,fenouil,betterave,navet,potiron,courge,légume,fruit,endive,artichaut,asperge,gingembre,figue,grenade,pamplemousse,citrouille',
+ boucherie:'jambon,poulet,boeuf,bœuf,steak,viande,porc,veau,agneau,saucisse,saucisson,lardon,bacon,dinde,canard,merguez,chipolata,rosbif,escalope,côte,rôti,steak haché,viande hachée,jambon blanc,jambon de paris,pâté de campagne,rillette,chorizo,salami,poisson,saumon,cabillaud,crevette,moule,cordon bleu,blanc de poulet,knacki,jambon cru',
  cremerie:'lait,beurre,crème,crème fraîche,fromage,fromage râpé,fromage blanc,yaourt,yogourt,oeuf,œuf,emmental,gruyère,comté,camembert,mozzarella,parmesan,chèvre,feta,ricotta,mascarpone,petit suisse,skyr,margarine,raclette,brie,roquefort,reblochon,dessert,flan,crème dessert,pâte feuilletée,pâte brisée',
- epicerie:'pâte,pâtes,spaghetti,tagliatelle,coquillette,riz,farine,sucre,sel,poivre,huile,vinaigre,moutarde,ketchup,mayonnaise,café,thé,tisane,chocolat,biscuit,gâteau,céréale,confiture,miel,pain,pain de mie,baguette,brioche,croissant,conserve,thon,sardine,sauce,épice,lentille,pois chiche,semoule,quinoa,chips,bonbon,compote,nutella,levure,bouillon,olive,cornichon,soupe,biscotte,muesli,tortilla,noix,amande,cacahuète,maïs,petit pois,farine,purée,croûton,apéritif',
+ epicerie:'pâte,pâtes,spaghetti,tagliatelle,coquillette,riz,farine,sucre,sel,poivre,huile,vinaigre,moutarde,ketchup,mayonnaise,café,thé,tisane,chocolat,biscuit,gâteau,céréale,confiture,miel,pain,pain de mie,baguette,brioche,croissant,conserve,thon,sardine,sauce,sauce tomate,coulis de tomate,concentré de tomate,épice,lentille,pois chiche,semoule,quinoa,chips,bonbon,compote,nutella,levure,bouillon,olive,cornichon,soupe,biscotte,muesli,tortilla,noix,amande,cacahuète,maïs,petit pois,farine,purée,croûton,apéritif',
  surgeles:'surgelé,glace,frite,pizza,sorbet,nugget,poisson pané,bâtonnet,esquimau,glaçon',
  boissons:'eau,eau gazeuse,jus,soda,coca,biere,bière,vin,sirop,limonade,champagne,cidre,whisky,rhum,vodka,pastis,perrier,badoit,ice tea,orangina,boisson',
  hygiene:'shampoing,shampooing,après-shampoing,savon,gel douche,dentifrice,brosse à dent,deodorant,déodorant,papier toilette,coton,coton-tige,rasoir,mousse à raser,mouchoir,couche,crème solaire,serviette hygiénique,tampon,lingette,crème hydratante,maquillage,démaquillant,bain de bouche',
@@ -64,21 +64,60 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const cmp=(a,b)=>a.name.localeCompare(b.name,'fr',{sensitivity:'base'});
 
 /* ================== Ajout ================== */
-function splitInput(t){
-  return String(t).split(/[,;\n]+|\s+(?:et|puis|plus)\s+/i)
-    .map(s=>s.trim().replace(/^(?:(?:de l|l|d)['’]\s*|(?:et|puis|des|du|de la|les|le|la|un|une|quelques|de)\s+(?:(?:l|d)['’]\s*)?)/i,'').trim())
-    .map(s=>s.replace(/[.!?]+$/,''))
-    .filter(Boolean).map(s=>s.charAt(0).toUpperCase()+s.slice(1));
+const CHUNK_RE=/[,;\n]+|\s+(?:et|puis|plus)\s+/i;
+function cleanName(x){
+  x=String(x).trim().replace(/^(?:(?:de l|l|d)['’]\s*|(?:et|puis|des|du|de la|les|le|la|un|une|quelques|de)\s+(?:(?:l|d)['’]\s*)?)/i,'').trim().replace(/[.!?]+$/,'');
+  return x?x.charAt(0).toUpperCase()+x.slice(1):'';
 }
+function splitInput(t){ return String(t).split(CHUNK_RE).map(cleanName).filter(Boolean); }
+
+/* Dictée : Android ne met aucune ponctuation (« œufs pâtes jambon blanc »).
+   On découpe en s'appuyant sur les articles (des, du, les…), les mots de liaison (de, d', à…),
+   les quantités, et les noms connus (dictionnaire + articles déjà saisis). */
+const V_SEP=/^(?:des|du|les|le|la|un|une|quelques|et|puis|plus|virgule|point|aussi|encore|ensuite|alors|euh|bon|ah|il|faut|me|nous|on|acheter|prendre|ajoute|ajouter|rajoute|mets|et puis)$/i;
+const V_GLUE=/^(?:de|à|au|aux|en|sans|pour)$/i;
+const V_UNIT=/^(?:kg|g|gr|grammes?|kilos?|litres?|l|cl|ml|paquets?|bouteilles?|boîtes?|boites?|pots?|sachets?|tranches?|barquettes?|packs?|lots?|douzaines?|demi|de|d['’])$/i;
+function knownStart(n){
+  const pre=n+' ';
+  for(const [p] of PHR) if(p===n||p.startsWith(pre)) return true;
+  for(const k in hist) if(k===n||k.startsWith(pre)) return true;
+  for(const k in learned) if(k===n||k.startsWith(pre)) return true;
+  return false;
+}
+const FIRSTW=new Set(PHR.map(([p])=>p.split(' ')[0]).filter(w=>!/^(blanc|petit|grand|demi)$/.test(w)));
+function isNoun(w){ const n=norm(w); if(!n) return false; if(WRD[n]||learned[n]||FIRSTW.has(n)) return true; for(const k in hist) if(k.split(' ')[0]===n) return true; return false; }
+function smartSplit(chunk){
+  const toks=String(chunk).replace(/(\b[dl])['’]\s*/gi,"$1' ").split(/\s+/).filter(Boolean);
+  const out=[]; let cur='', glue=false, unit=false;
+  const flush=()=>{ cur=cur.trim(); if(cur) out.push(cur); cur=''; glue=false; };
+  const add=w=>{ cur=!cur?w:(/'$/.test(cur)?cur+w:cur+' '+w); };
+  for(let i=0;i<toks.length;i++){
+    const w=toks[i], lw=w.toLowerCase();
+    if(/^\d/.test(w)){ flush(); unit=true; continue; }                      // « 6 œufs », « 2 kilos de pommes »
+    if(unit&&!cur&&V_UNIT.test(lw)) continue;
+    unit=false;
+    if(glue&&/^(?:la|le|les|l')$/.test(lw)){ add(lw); continue; }          // « glace à la vanille »
+    if(lw==="l'"){ flush(); continue; }                                    // « l'eau »
+    if(lw==='de'&&/^(?:la|l')$/i.test(toks[i+1]||'')){ flush(); i++; continue; } // « de la moutarde »
+    if(V_SEP.test(lw)){ flush(); unit=true; continue; }               // « une bouteille de lait »
+    if(lw==="d'"||V_GLUE.test(lw)){ if(cur){ add(lw); glue=true; } continue; }   // « jus d'orange », « pâté de campagne »
+    if(!cur||glue){ add(w); glue=false; continue; }
+    if(knownStart(norm(cur+' '+w))){ add(w); continue; }                   // « eau gazeuse », « steak haché »
+    if(isNoun(w)){ flush(); add(w); continue; }                            // nouveau nom connu = nouvel article
+    add(w);                                                                // sinon c'est un complément : « fromage râpé »
+  }
+  flush(); return out;
+}
+function splitVoice(t){ return String(t).split(CHUNK_RE).flatMap(smartSplit).map(cleanName).filter(Boolean); }
 function addNames(names){
   const added=[], dups=[], flash=[];
   for(const name of names){
     const n=norm(name); if(!n) continue;
     const ex=items.find(i=>norm(i.name)===n);
-    if(ex){ if(ex.taken){ex.taken=false; ex.t=Date.now();} dups.push(ex.name); flash.push(ex.id); continue; }
+    if(ex){ if(ex.taken){ex.taken=false; ex.t=Date.now();} dups.push(ex.name); flash.push(ex.id); if(hist[n]) hist[n].l=Date.now(); continue; }
     const it={id:uid(),name,cat:guessCat(name),taken:false,t:Date.now()};
     items.push(it); added.push(name); flash.push(it.id);
-    const h=hist[n]; hist[n]={name:h?h.name:name,cat:it.cat,c:(h?h.c:0)+1};
+    const h=hist[n]; hist[n]={name:h?h.name:name,cat:it.cat,c:(h?h.c:0)+1,l:Date.now()};
   }
   save(); render(flash);
   if(added.length) vib(12);
@@ -159,7 +198,7 @@ function textSheet(){
   openSheet(`<h3>Ajouter des articles ${X}</h3>
     <form class="field" id="f"><input id="in" autocomplete="off" autocapitalize="sentences" enterkeyhint="done" placeholder="ex. œufs, pâtes et jambon"><button class="pbtn">Ajouter</button></form>
     <div class="chips" id="sugg"></div>
-    <div class="hint" id="hint">Séparez plusieurs articles par une virgule ou « et ».</div>`,()=>{
+    <div class="hint" id="hint">Séparez par une virgule ou « et ». Appui long sur une suggestion pour l'oublier.</div>`,()=>{
     const inp=sheet.querySelector('#in'), hint=sheet.querySelector('#hint'), sugg=sheet.querySelector('#sugg');
     const show=r=>{hint.textContent=resultText(r)||' '; hint.className='hint'+(r.added.length?' ok':'');};
     const suggest=()=>{
@@ -167,7 +206,7 @@ function textSheet(){
       const inList=new Set(items.filter(i=>!i.taken).map(i=>norm(i.name)));
       let c=Object.entries(hist).filter(([k])=>!inList.has(k));
       if(q) c=c.filter(([k])=>k.startsWith(q)||k.split(' ').some(w=>w.startsWith(q)));
-      c=c.sort((a,b)=>b[1].c-a[1].c).slice(0,q?6:8);
+      c=c.sort((a,b)=>(b[1].c-a[1].c)||((b[1].l||0)-(a[1].l||0))).slice(0,q?6:8);
       sugg.innerHTML=c.map(([k,v])=>`<button type="button" class="chip cat-${v.cat}" style="--h:${CAT[v.cat].h}" data-n="${esc(v.name)}">${esc(v.name)}</button>`).join('');
     };
     sheet.querySelector('#f').addEventListener('submit',e=>{e.preventDefault(); const names=splitInput(inp.value); if(!names.length) return; show(addNames(names)); inp.value=''; suggest(); inp.focus();});
@@ -175,6 +214,9 @@ function textSheet(){
     sugg.addEventListener('click',e=>{const b=e.target.closest('.chip'); if(!b) return;
       const parts=inp.value.split(/([,;])/); parts[parts.length-1]=''; inp.value=parts.join('').replace(/[,;]\s*$/,'')+'';
       show(addNames([b.dataset.n])); if(!inp.value.trim()) inp.value=''; suggest(); inp.focus();});
+    sugg.addEventListener('contextmenu',e=>{const b=e.target.closest('.chip'); if(!b) return; e.preventDefault();
+      const n=norm(b.dataset.n); delete hist[n]; save(); vib(20); suggest();
+      hint.className='hint'; hint.textContent='« '+b.dataset.n+' » retiré des suggestions.';});
     suggest(); setTimeout(()=>inp.focus(),60);
   });
 }
@@ -195,12 +237,12 @@ function voiceSheet(){
   const fallback=msg=>{
     idle(msg,'Astuce hors réseau : utilisez le micro du clavier Google dans « Texte ».');
     let h=`<button class="sbtn" id="toKb" style="margin-top:12px; justify-content:center">Passer au clavier</button>`;
-    if(ENV!=='prod') h+=`<div class="hint">Simulation (PC) :</div><form class="field" id="sf" style="margin-top:6px"><input id="si" value="des œufs, du fromage râpé et de la lessive"><button class="pbtn">Dicter</button></form>`;
+    if(ENV!=='prod') h+=`<div class="hint">Simulation (PC) :</div><form class="field" id="sf" style="margin-top:6px"><input id="si" value="œufs pâtes jambon blanc fromage râpé lessive"><button class="pbtn">Dicter</button></form>`;
     alt.innerHTML=h;
     alt.querySelector('#toKb').onclick=()=>textSheet();
     const sf=alt.querySelector('#sf');
     if(sf) sf.addEventListener('submit',e=>{e.preventDefault(); const v=alt.querySelector('#si').value;
-      tr.textContent='« '+v+' »'; const r=addNames(splitInput(v)); vh.textContent=resultText(r); vh.className='hint ok'; alt.querySelector('#si').value='';});
+      tr.textContent='« '+v+' »'; const r=addNames(splitVoice(v)); vh.textContent=resultText(r); vh.className='hint ok'; alt.querySelector('#si').value='';});
   };
   const listen=()=>{
     if(!SR){fallback('La dictée n’est pas disponible sur cet appareil.'); return;}
@@ -213,7 +255,7 @@ function voiceSheet(){
         if(e.error==='no-speech'||e.error==='aborted') idle('Je n’ai rien entendu.');
         else fallback({'not-allowed':'Le micro n’est pas autorisé pour Cabas.','service-not-allowed':'Le micro n’est pas autorisé pour Cabas.','network':'Pas de réseau pour la dictée.','audio-capture':'Aucun micro détecté.'}[e.error]||'La dictée a été interrompue.');};
       rec.onend=()=>{rec=null;
-        if(finalT){mic.classList.remove('live'); const r=addNames(splitInput(finalT)); vh.textContent=resultText(r); vh.className='hint ok'; setTimeout(()=>{if(sheet.classList.contains('on')&&sheet.querySelector('#mic')===mic) closeSheet();},1200);}
+        if(finalT){mic.classList.remove('live'); const r=addNames(splitVoice(finalT)); vh.textContent=resultText(r); vh.className='hint ok'; setTimeout(()=>{if(sheet.classList.contains('on')&&sheet.querySelector('#mic')===mic) closeSheet();},1200);}
         else if(!failed) idle('Je n’ai rien entendu.');};
       rec.start();
     }catch(e){fallback('La dictée n’est pas disponible sur cet appareil.');}
