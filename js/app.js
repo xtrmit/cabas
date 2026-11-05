@@ -84,7 +84,7 @@ function guessCat(name){
 const ENV=window.CABAS_ENV||'local';
 const VERSION=self.CABAS_VERSION||'?';
 const KEY='cabas:'+ENV;
-let items=[], hist={}, learned={}, learnedE={}, S={sort:'alpha', fs:2};
+let items=[], hist={}, learned={}, learnedE={}, S={sort:'alpha', fs:2, theme:'auto'};
 const uid=()=>Math.random().toString(36).slice(2,9);
 function seed(){
   learned={}; learnedE={}; hist={}; items=[];
@@ -346,6 +346,14 @@ function itemMenu(id){
   onClose=()=>{sheet.onclick=null};
 }
 
+/* --- Thème : auto / clair / sombre --- */
+function applyTheme(){
+  const t=S.theme||'auto', root=document.documentElement;
+  if(t==='auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme',t);
+  const l=document.getElementById('tcLight'), d=document.getElementById('tcDark');
+  if(l&&d){ const c=t==='dark'?'#141617':t==='light'?'#f5f4f0':null; l.content=c||'#f5f4f0'; d.content=c||'#141617'; }
+}
+
 /* --- Réglages --- */
 function settingsSheet(){
   openSheet(`<h3>Réglages ${X}</h3>
@@ -353,13 +361,15 @@ function settingsSheet(){
     <div class="sizes">${[1,2,3,4].map(n=>`<button data-fs="${n}" class="${S.fs==n?'sel':''}" style="font-size:${[13,16,19,23][n-1]}px">Aa</button>`).join('')}</div>
     <div class="hint">La grille s'adapte : 4 colonnes en petit, 1 colonne en très grand.</div>
     <div class="lbl">Thème</div>
-    <div class="hint" style="margin-top:0">Suit automatiquement le mode clair / sombre du téléphone.</div>
+    <div class="sizes three">${[['auto','<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>','Auto'],['light','<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>','Clair'],['dark','<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>','Sombre']].map(([k,i,n])=>`<button data-theme="${k}" class="${(S.theme||'auto')===k?'sel':''}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${i}</svg>${n}</button>`).join('')}</div>
+    <div class="hint">Auto suit le mode clair / sombre du téléphone.</div>
     <div class="lbl">Application</div>
     <button class="sbtn" data-upd>Rechercher une mise à jour</button>
     ${ENV!=='prod'?`<button class="sbtn" data-reset>Charger la liste d'exemple (${ENV})</button>`:''}
     <div class="hint" id="updh" style="text-align:center; margin-top:16px">Cabas v${VERSION}${ENV!=='prod'?' · '+ENV.toUpperCase():''}</div>`,()=>{});
   sheet.onclick=e=>{
     const b=e.target.closest('[data-fs]'); if(b){S.fs=+b.dataset.fs; save(); render(); sheet.querySelectorAll('[data-fs]').forEach(x=>x.classList.toggle('sel',x===b));}
+    const th=e.target.closest('[data-theme]'); if(th){S.theme=th.dataset.theme; save(); applyTheme(); vib(8); sheet.querySelectorAll('[data-theme]').forEach(x=>x.classList.toggle('sel',x===th));}
     if(e.target.closest('[data-reset]')){seed(); save(); closeSheet(); grid.innerHTML=''; render();}
     if(e.target.closest('[data-upd]')) checkUpdate(sheet.querySelector('#updh'));
   };
@@ -409,7 +419,8 @@ if('serviceWorker' in navigator){
 try{ navigator.storage&&navigator.storage.persist&&navigator.storage.persist(); }catch(e){}
 
 if(ENV!=='prod'){const t=document.getElementById('envTag'); t.textContent=ENV.toUpperCase(); t.hidden=false; t.classList.add('env-'+ENV);}
-load(); render();
+load(); applyTheme(); render();
+if(ENV!=='prod'){const lg=document.getElementById('brandLogo'); if(lg) lg.src='icons/test-icon-192.png';}
 if(S.lastV&&S.lastV!==VERSION) S.updNote=VERSION;   // nouvelle version installée : on l'annonce (même si la page se recharge encore une fois)
 S.lastV=VERSION; save();
 if(S.updNote===VERSION) setTimeout(()=>{toast('Cabas mis à jour (v'+VERSION+')'); setTimeout(()=>{delete S.updNote; save();},4000);},500);
