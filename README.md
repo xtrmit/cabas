@@ -7,8 +7,8 @@ Une liste de courses Android simple, qui fonctionne hors ligne. C'est une applic
 | Version | Où | Rôle | Icône |
 |---|---|---|---|
 | **LOCAL** | `http://localhost:8080` sur le PC | Développer et tester à chaud | balise LOCAL |
-| **TEST** | `https://<compte>.github.io/cabas-test/` | Valider sur un téléphone | orange, « Cabas T » |
-| **PROD** | `https://<compte>.github.io/cabas/` | Usage réel sur le S25 / S26 | verte, « Cabas » |
+| **TEST** | `https://<compte>.github.io/cabas-test/` | Valider sur un téléphone | badge orange « T », « Cabas T » |
+| **PROD** | `https://<compte>.github.io/cabas/` | Usage réel sur les téléphones | « Cabas » |
 
 Chaque version garde ses propres données. Tester en TEST ne touche donc jamais la vraie liste.
 
@@ -29,7 +29,7 @@ Ce script installe GitHub CLI si besoin, ouvre la connexion GitHub dans le navig
 3. **Valider sur le téléphone**, avec l'app « Cabas T » (orange).
 4. **Publier en PROD** : lancer `.\tools\deploy.ps1 prod`, puis taper `OUI` pour confirmer. Seul le code déjà passé par TEST est accepté.
 
-## Installer sur un téléphone (S25 / S26)
+## Installer sur un téléphone
 
 1. Ouvrir l'adresse PROD (ou TEST) dans **Chrome**.
 2. Menu ⋮ → **Ajouter à l'écran d'accueil** → **Installer**.
@@ -54,7 +54,7 @@ js/app.js                  logique (liste, tri, catégories, voix, réglages)
 version.js                 numéro de version (déclenche les mises à jour)
 sw.js                      service worker : hors ligne + mise à jour
 manifest*.webmanifest      fiches d'installation (PROD / TEST)
-icons/                     icônes (vertes = PROD, orange = TEST)
+icons/                     icônes (PROD, et TEST avec badge orange « T »)
 tools/                     serve.ps1, setup-github.ps1, deploy.ps1
 ```
 
